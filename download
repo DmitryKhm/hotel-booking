@@ -1,0 +1,6 @@
+**/target
+.git
+.run
+.idea
+.env
+*.log

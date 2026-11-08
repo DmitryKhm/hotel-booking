@@ -1,0 +1,44 @@
+server:
+  port: ${SERVER_PORT:8080}
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          httpclient:
+            connect-timeout: 3000
+            response-timeout: 15s
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+security:
+  jwt:
+    secret: ${JWT_SECRET:development-only-user-signing-key-change-me-0123456789}
+    issuer: ${JWT_ISSUER:hotel-booking}
+    audience: ${JWT_AUDIENCE:hotel-api}
+gateway:
+  services:
+    booking-uri: lb://booking-service
+    hotel-uri: lb://hotel-service
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+logging:
+  structured:
+    format:
+      console: ecs

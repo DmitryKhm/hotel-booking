@@ -1,0 +1,49 @@
+services:
+  discovery-server:
+    build:
+      context: .
+      args:
+        MODULE: discovery-server
+    ports:
+      - "127.0.0.1:8761:8761"
+  hotel-service:
+    build:
+      context: .
+      args:
+        MODULE: hotel-service
+    environment:
+      EUREKA_URL: http://discovery-server:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-development-only-user-signing-key-change-me-0123456789}
+      INTERNAL_JWT_SECRET: ${INTERNAL_JWT_SECRET:-development-only-internal-signing-key-change-me-9876543210}
+    ports:
+      - "127.0.0.1:8082:8082"
+    depends_on:
+      - discovery-server
+  booking-service:
+    build:
+      context: .
+      args:
+        MODULE: booking-service
+    environment:
+      EUREKA_URL: http://discovery-server:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-development-only-user-signing-key-change-me-0123456789}
+      INTERNAL_JWT_SECRET: ${INTERNAL_JWT_SECRET:-development-only-internal-signing-key-change-me-9876543210}
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      - discovery-server
+      - hotel-service
+  api-gateway:
+    build:
+      context: .
+      args:
+        MODULE: api-gateway
+    environment:
+      EUREKA_URL: http://discovery-server:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-development-only-user-signing-key-change-me-0123456789}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - discovery-server
+      - booking-service
+      - hotel-service
